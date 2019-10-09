@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "yap_internal.h": "c",
+        "yap.h": "c"
+    }
+}
