@@ -10,7 +10,7 @@ For uC implementation HAL library is used to be able to port this library for mo
 
 # Communication graph
 
-![Comminication_diagram](assets\Comminication_diagram.jpg)
+![Comminication_diagram](assets/Comminication_diagram.jpg)
 
 # Usage for Windows
 
