@@ -112,7 +112,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 }
 ```
 
- 
+ # Compiling
+
+```bash
+mingw32-make all
+```
+
+
 
 # License
 
