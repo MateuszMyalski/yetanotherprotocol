@@ -19,15 +19,16 @@ int main(int argc, char* argv[]) {
 	/* Set parameters */
 	YAP_setBaudRate(protocolHandler, BAUD_RATE_115200);
 	YAP_setByteSize(protocolHandler, DATA_BITS_8 );
+	YAP_setStopBits(protocolHandler, ONE_STOP_BIT);
 	YAP_setParity(protocolHandler, NO_PARITY);
-	YAP_setAnswearTimeout(protocolHandler, 4000);
+	YAP_setAnswerTimeout(protocolHandler, 4000);
 
 	/* Display parameters */
 	printf("===Protocole settings===\n");
 	printf("\tBaud rate: %db/s\n", YAP_getBaudRate(protocolHandler));
 	printf("\tByte size: %dbits\n", YAP_getByteSize(protocolHandler));
 	printf("\tParity: %d\n", YAP_getParity(protocolHandler));
-	printf("\tACK Timeout: %dms\n", YAP_getAnswearTimeout(protocolHandler));
+	printf("\tACK Timeout: %dms\n", YAP_getAnswerTimeout(protocolHandler));
 
 	printf("\n\n");
 	printf("SENDING:\n");

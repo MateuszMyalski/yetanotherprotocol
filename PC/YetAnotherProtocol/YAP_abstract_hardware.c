@@ -1,8 +1,40 @@
+/*******************************************************************************************************
+ *    MIT License                       
+ *                      
+ *    Copyright (c) 2019 Mateusz Waldemar Myalski                       
+ *                      
+ *    Permission is hereby granted, free of charge, to any person obtaining a copy                      
+ *    of this software and associated documentation files (the "Software"), to deal                     
+ *    in the Software without restriction, including without limitation the rights                      
+ *    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell                     
+ *    copies of the Software, and to permit persons to whom the Software is                     
+ *    furnished to do so, subject to the following conditions:                      
+ *                      
+ *    The above copyright notice and this permission notice shall be included in all                        
+ *    copies or substantial portions of the Software.                       
+ *                      
+ *    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR                        
+ *    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,                      
+ *    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE                       
+ *    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER                        
+ *    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,                     
+ *    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE                     
+ *    SOFTWARE.                     
+ *                                       
+ *******************************************************************************************************/
+
+/**
+ * @file YAP_abstract_hardware.c
+ * @author Mateusz Waldemar Myalski
+ * @date 8 Oct 2019
+ * @brief File contain abstract layer for hardware operations
+ */
+
 #include "YAP_internal.h"
 
-uint8_t YAP_sendByte(YAPHandler *handler, char data) {
+uint8_t YAP_sendByte(YAPHandler *handler, uint8_t data) {
 	YAPHandlerInternal *YAPh = (YAPHandlerInternal *)handler;
-	unsigned long bytesToWrite = sizeof(char);
+	unsigned long bytesToWrite = sizeof(uint8_t);
 	unsigned long bytesWritten = 0;
 	uint8_t status = 0;
 	status = WriteFile(
@@ -14,13 +46,13 @@ uint8_t YAP_sendByte(YAPHandler *handler, char data) {
 
 	if (!status) {
 		#ifdef DEBUG_INFORMATIONS
-		printf("Error when writting to file.\n");
+		printf("[Debug] Error when writting to file.\n");
 		#endif
 		return 0;
 	}
 	if (bytesToWrite != bytesWritten) {
 		#ifdef DEBUG_INFORMATIONS
-		printf("Error while sending data.\n");
+		printf("[Debug] Error while sending data.\n");
 		#endif
 		return 0;
 	}
@@ -38,14 +70,14 @@ void YAP_sendTimeouts(YAPHandler *handler) {
     SetCommTimeouts(YAPh->PortHandle, &timeouts);
 }
 
-void YAP_receiveAnswearTimeouts(YAPHandler *handler) {
+void YAP_receiveAnswerTimeouts(YAPHandler *handler) {
 	YAPHandlerInternal *YAPh = (YAPHandlerInternal *)handler;
 	COMMTIMEOUTS timeouts = { 0 };
 
 	GetCommTimeouts(YAPh->PortHandle, &timeouts);
-	timeouts.ReadIntervalTimeout         = YAPh->answearTimeout;
+	timeouts.ReadIntervalTimeout         = YAPh->answerTimeout;
     timeouts.ReadTotalTimeoutConstant    = 0;
-    timeouts.ReadTotalTimeoutMultiplier  = YAPh->answearTimeout;
+    timeouts.ReadTotalTimeoutMultiplier  = YAPh->answerTimeout;
 
     SetCommTimeouts(YAPh->PortHandle, &timeouts);
 }
@@ -83,17 +115,17 @@ uint8_t YAP_waitForByte(YAPHandler *handler, uint8_t byte) {
 	return byte;
 }
 
-uint8_t YAP_poolForAnswear(YAPHandler *handler, uint8_t question, uint8_t answear) {
+uint8_t YAP_poolForAnswer(YAPHandler *handler, uint8_t question, uint8_t answer) {
 	char receivedFlag = 0;
 
-	YAP_receiveAnswearTimeouts(handler);
+	YAP_receiveAnswerTimeouts(handler);
 
 	YAP_sendByte(handler, question);
 	receivedFlag = YAP_receiveByte(handler);
 
 	YAP_receiveTimeouts(handler);
 
-    if(receivedFlag == answear)
+    if(receivedFlag == answer)
         return 1;
     else
         return 0;

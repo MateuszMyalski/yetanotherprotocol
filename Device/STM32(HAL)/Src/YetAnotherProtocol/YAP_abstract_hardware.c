@@ -1,3 +1,35 @@
+/*******************************************************************************************************
+ *    MIT License                       
+ *                      
+ *    Copyright (c) 2019 Mateusz Waldemar Myalski                       
+ *                      
+ *    Permission is hereby granted, free of charge, to any person obtaining a copy                      
+ *    of this software and associated documentation files (the "Software"), to deal                     
+ *    in the Software without restriction, including without limitation the rights                      
+ *    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell                     
+ *    copies of the Software, and to permit persons to whom the Software is                     
+ *    furnished to do so, subject to the following conditions:                      
+ *                      
+ *    The above copyright notice and this permission notice shall be included in all                        
+ *    copies or substantial portions of the Software.                       
+ *                      
+ *    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR                        
+ *    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,                      
+ *    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE                       
+ *    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER                        
+ *    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,                     
+ *    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE                     
+ *    SOFTWARE.                     
+ *                                       
+ *******************************************************************************************************/
+
+/**
+ * @file YAP_abstract_hardware.c
+ * @author Mateusz Waldemar Myalski
+ * @date 8 Oct 2019
+ * @brief File contain abstract layer for hardware operations
+ */
+
 #include "YetAnotherProtocol/YAP_internal.h"
 
 uint8_t YAP_sendByte(YAPHandler *handler, uint8_t data) {
@@ -27,9 +59,9 @@ uint8_t YAP_receiveByte(YAPHandler *handler) {
 }
 
 
-void YAP_receiveAnswearTimeouts(YAPHandler *handler) {
+void YAP_receiveAnswerTimeouts(YAPHandler *handler) {
 	YAPHandlerInternal *YAPh = (YAPHandlerInternal *)handler;
-	YAPh->selectedTimeout = YAPh->answearTimeout;
+	YAPh->selectedTimeout = YAPh->answerTimeout;
 }
 
 
@@ -39,17 +71,17 @@ void YAP_receiveTimeouts(YAPHandler *handler) {
 }
 
 
-uint8_t YAP_poolForAnswear(YAPHandler *handler, uint8_t question, uint8_t answear) {
+uint8_t YAP_poolForAnswer(YAPHandler *handler, uint8_t question, uint8_t answer) {
 	char receivedFlag = 0;
 
-	YAP_receiveAnswearTimeouts(handler);
+	YAP_receiveAnswerTimeouts(handler);
 
 	YAP_sendByte(handler, question);
 	receivedFlag = YAP_receiveByte(handler);
 
 	YAP_receiveTimeouts(handler);
 
-	if(receivedFlag == answear)
+	if(receivedFlag == answer)
 		return 1;
 	else
 		return 0;

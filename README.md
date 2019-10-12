@@ -1,18 +1,12 @@
 # YAP - Yet Another Protocol
 
-__TODO:__
-[O] Answear -> answer spelling
-[O] Code cleanup
-[O] Snippetsd
-[O] Code documentation
-[O] Examples
-[O] Add graphs
-[O] Licence
+[TOC]
 
-Protocol designed to communicate between two devices (etc. PC -> uC) using COM interface and UART communication without external handshaking connections. Algorithm is using only external interrupts on uC without wasting DMA channels. Sender can set the packet ID and payload field. After creating the packet handler, the program will care for the proper CRC16 CITT and message length field. This simplicity allow coder to implement easily proper communication between two devices without worrying if the data is passed through without any changes. The user API will just return the status of the transmission and will inform if the data came or were sent corrupted. 
+Protocol designed to communicate between two devices (etc. PC -> uC) using COM interface and UART communication without external handshaking connections. Algorithm is using only external interrupts on uC without wasting DMA channels. Sender can set the packet ID and payload field. After creating the packet handler, the program will take care for the proper CRC16 CITT generation and message length field. This simplicity allow coder to implement easily proper communication between two devices without worrying if the data is passed through without any changes. The user API will return the status of the transmission and will inform if the data came or were sent corrupted. 
 
-Right now the library for PC is written using WINAPI in ANSI C. This still allow to use simple functions, to send or receive packet form another device.
-For uC implementation HAL library is used to be able port library to mostly all STM microcontrollers. 
+Right now the library for PC is written using only WINAPI in ANSI C, I am planing to expand this project to UNIX compatibility. Makefiles are included to compile the program by yourself and to make your own changes if necessary.
+For uC implementation HAL library is used to be able to port this library for mostly all STM microcontrollers. 
+
 
 # Communication graph
 
@@ -31,8 +25,9 @@ For uC implementation HAL library is used to be able port library to mostly all 
 YAPHandler *protocolHandler = YAP_handlerCreate(COM_NUMBER);
 YAP_setBaudRate(protocolHandler, BAUD_RATE_115200);
 YAP_setByteSize(protocolHandler, DATA_BITS_8);
+YAP_setStopBits(protocolHandler, ONE_STOP_BIT);
 YAP_setParity(protocolHandler, NO_PARITY);
-YAP_setAnswearTimeout(protocolHandler, ANSWER_TIME);
+YAP_setAnswerTimeout(protocolHandler, ANSWER_TIME);
 ```
 
 ## 2. Sending packet
@@ -69,12 +64,15 @@ YAP_packetDestroy(packetToSend);
 YAP_handlerDestroy(protocolHandler);	// This will automatically close the COM port
 ```
 
-# Usage for STM
+# Usage for STM devices
 
 ## 1. Hardware initialisation
 
 1.1 Using CubeMx software, select UART pins, and setup the popper configuration for the interface. 
-__1.2 Enable global UART interrupts in NVIC!__
+
+1.2 __Enable global UART interrupts in NVIC.__
+
+1.3 Drag files to the corresponding generated folders.
 
 ## 2. Protocol initialisation, sending and receiving packet
 
@@ -88,7 +86,7 @@ uint8_t rxByte;
 
 int main(void) {
     protocolHandler = YAP_handlerCreate(&huart1);	// Select the propper huart typedef
-    YAP_setAnswearTimeout(protocolHandler, 4000);
+    YAP_setAnswerTimeout(protocolHandler, 4000);
     
     packetToReceive = YAP_emptyPacketCreate();
     
@@ -115,3 +113,23 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 ```
 
  
+
+# License
+
+MIT License
+
+Copyright (c) 2019 Mateusz Waldemar Myalski
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal 
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

@@ -1,32 +1,30 @@
+/*******************************************************************************************************
+ *    MIT License                       
+ *                      
+ *    Copyright (c) 2019 Mateusz Waldemar Myalski                       
+ *                      
+ *    Permission is hereby granted, free of charge, to any person obtaining a copy                      
+ *    of this software and associated documentation files (the "Software"), to deal                     
+ *    in the Software without restriction, including without limitation the rights                      
+ *    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell                     
+ *    copies of the Software, and to permit persons to whom the Software is                     
+ *    furnished to do so, subject to the following conditions:                      
+ *                      
+ *    The above copyright notice and this permission notice shall be included in all                        
+ *    copies or substantial portions of the Software.                       
+ *                      
+ *    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR                        
+ *    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,                      
+ *    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE                       
+ *    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER                        
+ *    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,                     
+ *    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE                     
+ *    SOFTWARE.                     
+ *                                       
+ *******************************************************************************************************/
+
 #ifndef YAP_internal_h
 #define YAP_internal_h
-/*
- * PACKET STRUCTURE:
- *
- * 		DLE
- * 		STX
- *		Information Field
- * 		DLE
- * 		STX
- *
- * INFORMATION FIELD:
- *
- * 		Packet ID
- * 		Packet Size (Payload size to receive)
- * 		Data
- * 		.
- * 		.
- *
- * COMMAND FIELD:
- *
- * 		0-255 (Command number)
- *
- * DATA:
- *
- * 		(Max 250 bytes)
- *
- */
-
 
 #include <stdint.h>
 #include <stdio.h>
@@ -49,26 +47,26 @@
 typedef struct {
     HANDLE      PortHandle;
     DCB         SerialParams;
-    uint16_t    answearTimeout;
+    uint16_t    answerTimeout;
 } YAPHandlerInternal;
 
 typedef struct {
-   	YAPStateEnum		transsmisionState;
-    char                *payload;
-    uint16_t             crc16;
-    uint8_t             payloadLength;
-    uint8_t				payloadCounter;
-    uint8_t             packetID;
+   	YAPStateEnum    transsmisionState;
+    uint16_t        crc16;
+    uint8_t         payloadLength;
+    uint8_t		    payloadCounter;
+    uint8_t         packetID;
+    char            *payload;
 } YAPPacketInternal;
 
 void YAP_sendTimeouts           (YAPHandler *handler);
 void YAP_receiveACKTimeouts     (YAPHandler *handler);
 void YAP_receiveTimeouts        (YAPHandler *handler);
 
-uint8_t YAP_poolForAnswear      (YAPHandler *handler, uint8_t question, uint8_t answear);
-uint8_t YAP_sendByte            (YAPHandler *handler, char data);
+uint8_t YAP_poolForAnswer       (YAPHandler *handler, uint8_t question, uint8_t answer);
+uint8_t YAP_sendByte            (YAPHandler *handler, uint8_t data);
 uint8_t YAP_receiveByte         (YAPHandler *handler);
 
-uint16_t YAP_crc16(uint8_t *data, uint16_t size);
+uint16_t YAP_crc16              (uint8_t *data, uint16_t size);
 
 #endif
