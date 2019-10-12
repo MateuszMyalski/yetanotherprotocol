@@ -135,12 +135,20 @@ YAPPacket *YAP_packetCreate(uint8_t packetID, char *payload) {
     YAPPacketInternal *YAPp   = (YAPPacketInternal *) malloc((sizeof *YAPp));
     YAPp->packetID            = packetID;
     YAPp->payload             = payload;
-    YAPp->payloadLength       = strlen(payload);
+    YAPp->payloadLength       = strlen(payload) + 2;
+    YAPp->crc16               = YAP_crc16((uint8_t *)YAPp->payload, YAPp->payloadLength - 2);
     return YAPp;
 }
 
 YAPPacket *YAP_emptyPacketCreate(void) {
     YAPPacketInternal *YAPp   = (YAPPacketInternal *) malloc((sizeof *YAPp));
+    YAPp->transsmisionState = TRANSSMISION_NOT_ENQUIRED;
+	YAPp->crc16 			= 0;
+	YAPp->packetID 			= 0;
+	YAPp->payloadLength		= 0;
+	YAPp->payloadCounter	= 0;
+	YAPp->payload			= NULL;
+
     return YAPp;
 }
 
@@ -160,3 +168,10 @@ char *YAP_getPacketPayload(YAPPacket *packet) {
     return YAPp->payload;
 }
 
+uint8_t YAP_isPacketReady(YAPPacket *packet) {
+	YAPPacketInternal *YAPp = (YAPPacketInternal *)packet;
+	if (YAPp->transsmisionState == PACKET_READY)
+		return 1;
+	else
+		return 0;
+}

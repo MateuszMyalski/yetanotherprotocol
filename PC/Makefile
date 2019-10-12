@@ -10,8 +10,8 @@ all: main
 	@echo ======================ENDING PROGRAM======================
 	
 
-main: main.o YAP_user_API.o YAP_send_packet.o YAP_receive_packet.o YAP_abstract_hardware.o
-	$(CC) $(FLAGS) -o $(OUTFILENAME) $(BUILDPATH)/main.o $(BUILDPATH)/YAP_user_API.o $(BUILDPATH)/YAP_send_packet.o $(BUILDPATH)/YAP_receive_packet.o $(BUILDPATH)/YAP_abstract_hardware.o 
+main: main.o YAP_user_API.o YAP_send_packet.o YAP_receive_packet.o YAP_abstract_hardware.o YAP_process_byte.o
+	$(CC) $(FLAGS) -o $(OUTFILENAME) $(BUILDPATH)/main.o $(BUILDPATH)/YAP_user_API.o $(BUILDPATH)/YAP_send_packet.o $(BUILDPATH)/YAP_receive_packet.o $(BUILDPATH)/YAP_abstract_hardware.o $(BUILDPATH)/YAP_process_byte.o 
 
 main.o: main.c
 	$(CC) $(FLAGS) -c main.c -o $(BUILDPATH)/main.o
@@ -27,6 +27,9 @@ YAP_receive_packet.o: $(LIBPATH)/YAP_receive_packet.c
 
 YAP_abstract_hardware.o: $(LIBPATH)/YAP_abstract_hardware.c
 	$(CC) $(FLAGS) -c $(LIBPATH)/YAP_abstract_hardware.c -o $(BUILDPATH)/YAP_abstract_hardware.o
+
+YAP_process_byte.o: $(LIBPATH)/YAP_process_byte.c
+	$(CC) $(FLAGS) -c $(LIBPATH)/YAP_process_byte.c -o $(BUILDPATH)/YAP_process_byte.o
 
 clean:
 	del -f $(BUILDPATH)\*.o

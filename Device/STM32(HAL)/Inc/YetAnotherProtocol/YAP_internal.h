@@ -46,17 +46,17 @@
 typedef struct {
     UART_HandleTypeDef      *huart;
     uint32_t    			answearTimeout;
-   	uint32_t				receiveTimeout;
-   	uint32_t				sendTimeout;
-   	uint32_t				selectedTimeout;
+    uint32_t				receiveTimeout;
+    uint32_t				selectedTimeout;
 } YAPHandlerInternal;
 
 typedef struct {
-    YAPAsyncStateEnum   AsyncState;
+   	YAPStateEnum		transsmisionState;
     char                *payload;
+    uint16_t             crc16;
     uint8_t             payloadLength;
+    uint8_t				payloadCounter;
     uint8_t             packetID;
-    uint8_t             crc16;
 } YAPPacketInternal;
 
 void YAP_sendTimeouts           (YAPHandler *handler);
@@ -64,7 +64,9 @@ void YAP_receiveACKTimeouts     (YAPHandler *handler);
 void YAP_receiveTimeouts        (YAPHandler *handler);
 
 uint8_t YAP_poolForAnswear      (YAPHandler *handler, uint8_t question, uint8_t answear);
-uint8_t YAP_sendByte            (YAPHandler *handler, char data);
+uint8_t YAP_sendByte            (YAPHandler *handler, uint8_t data);
 uint8_t YAP_receiveByte         (YAPHandler *handler);
+
+uint16_t YAP_crc16(uint8_t *data, uint16_t size);
 
 #endif

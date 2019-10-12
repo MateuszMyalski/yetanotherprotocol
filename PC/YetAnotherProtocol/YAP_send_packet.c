@@ -7,45 +7,63 @@ uint8_t YAP_sendPacket(YAPHandler *handler, YAPPacket *packet) {
 	if (YAPp->payloadLength > 250)
 		return 0;
 
-	/* Prepare transmission */
-	YAPp->AsyncState = ENQUIRING_TRANSMISSION;
-	if(!YAP_poolForAnswear(handler, ENQ, ACK))
+	#ifdef DEBUG_INFORMATIONS
+	printf("[I] Enquiring transmission.\n");
+	#endif
+
+	YAP_sendByte(handler, ENQ);
+	if (!(YAP_receiveByte(handler) == ACK))
 		return 0;
 
-	/* Send payload */
-	uint8_t tries = 0;
-	do {
-		YAPp->AsyncState = SENDING_PAYLOAD;
+	#ifdef DEBUG_INFORMATIONS
+	printf("[I] Transsmision enquired.\n");
+	printf("[I] Sending packet ID(%d).\n", YAPp->packetID);
+	#endif
 
-		/* Prepare device for receiving the data */
-		if(!YAP_poolForAnswear(handler, STX, ACK))
-			return 0;
+	if (!YAP_poolForAnswear(handler, YAPp->packetID, ACK))
+		return 0;
+	
+	#ifdef DEBUG_INFORMATIONS
+	printf("[I] Sending packet length(%d).\n", YAPp->payloadLength);
+	#endif
 
-		/* Send settings frame and payload length */
-		YAP_sendByte(handler, YAPp->packetID);
-		YAP_sendByte(handler, YAPp->payloadLength);
-
-		/* Send payload */
-		uint8_t charCounter;
-				charCounter = 0;
-		while (YAPp->payloadLength != charCounter) {
-			if (!(YAPp->payload[charCounter] >= 0x20 && YAPp->payload[charCounter] <= 0x7E))
-				YAP_sendByte(handler, DLE);
-
-			YAP_sendByte(handler, YAPp->payload[charCounter]);
-
-			++charCounter;
-		}
-		// TODO add CRC
-		++tries;
-	} while (!YAP_poolForAnswear(handler, ETX, ACK) && tries < 4);
-
-	if (tries >= 3)
+	if (!YAP_poolForAnswear(handler, YAPp->payloadLength, ACK))
 		return 0;
 
-	/* Finish transmission */
-	YAPp->AsyncState = FINISHING_TRANSMISSION;
-	return YAP_poolForAnswear(handler, EOT, ACK);
+	#ifdef DEBUG_INFORMATIONS
+	printf("[I] Sending packet payload(%d).\n{ ", YAPp->payloadLength);
+	#endif
+
+	uint8_t charCounter = 0;
+	while(charCounter != (YAPp->payloadLength - 2)) {
+		YAP_sendByte(handler, YAPp->payload[charCounter]);
+		#ifdef DEBUG_INFORMATIONS
+		printf("%c[%d], ", (char)YAPp->payload[charCounter], YAPp->payload[charCounter]);
+		#endif
+		++charCounter;
+	}
+
+	#ifdef DEBUG_INFORMATIONS
+	printf("}\n[I] Finishing transsmision.\n");
+	#endif
+
+	#ifdef DEBUG_INFORMATIONS
+	printf("[I] Sending CRC(0x%x)\n", YAPp->crc16);
+	#endif
+	YAP_sendByte(handler, (uint8_t)(YAPp->crc16 >> 8));
+	YAP_sendByte(handler, (uint8_t)(YAPp->crc16));
+
+	if (YAP_poolForAnswear(handler, EOT, ACK)){
+		#ifdef DEBUG_INFORMATIONS
+		printf("[I] Succesfull transsmision.\n");
+		#endif
+		return 1;
+	}else {
+		#ifdef DEBUG_INFORMATIONS
+		printf("[I] Unsuccesfull transsmision.\n");
+		#endif
+		return 0;
+	}
 }
 
 void YAP_sendPacketAsync(YAPHandler *handler, YAPPacket *packet) {

@@ -9,7 +9,7 @@
 #include "YAP.h"
 
 int main(int argc, char* argv[]) {
-	char payload[] = "";
+	char payload[] = "ABCDEFG\0";
 	YAPPacket *sendPacket = YAP_packetCreate(52, payload);
 	YAPPacket *receivedPacket = YAP_emptyPacketCreate();
 
@@ -29,9 +29,15 @@ int main(int argc, char* argv[]) {
 	printf("\tParity: %d\n", YAP_getParity(protocolHandler));
 	printf("\tACK Timeout: %dms\n", YAP_getAnswearTimeout(protocolHandler));
 
-	// YAP_sendPacket(protocolHandler, sendPacket);
-	uint8_t byte = YAP_waitForByte(protocolHandler, 0x05);
-	printf("Result: %d\n", YAP_receivePacket(protocolHandler, receivedPacket, &byte));
+	printf("\n\n");
+	printf("SENDING:\n");
+
+	YAP_sendPacket(protocolHandler, sendPacket);
+	
+	printf("\n\n");
+	printf("RECEIVING:\n");
+
+	printf("\tResult: %d\n", YAP_receivePacket(protocolHandler, receivedPacket));
 	printf("\tPacketID: %d\n", YAP_getPacketID(receivedPacket));
 	printf("\tPacket payload: %s\n", YAP_getPacketPayload(receivedPacket));
 

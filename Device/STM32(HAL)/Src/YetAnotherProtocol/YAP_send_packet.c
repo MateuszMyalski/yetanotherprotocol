@@ -7,47 +7,30 @@ uint8_t YAP_sendPacket(YAPHandler *handler, YAPPacket *packet) {
 	if (YAPp->payloadLength > 250)
 		return 0;
 
-	/* Prepare transmission */
-	YAPp->AsyncState = ENQUIRING_TRANSMISSION;
-	if(!YAP_poolForAnswear(handler, ENQ, ACK))
+//	YAP_sendByte(handler, ENQ);
+//	if (!(YAP_receiveByte(handler) == ACK))
+//		return 0;
+
+	if (!YAP_poolForAnswear(handler, ENQ, ACK))
 		return 0;
 
-	/* Send payload */
-	uint8_t tries = 0;
-	do {
-		YAPp->AsyncState = SENDING_PAYLOAD;
-
-		/* Prepare device for receiving the data */
-		if(!YAP_poolForAnswear(handler, STX, ACK))
-			return 0;
-
-		/* Send settings frame and payload length */
-		YAP_sendByte(handler, YAPp->packetID);
-		YAP_sendByte(handler, YAPp->payloadLength);
-
-		/* Send payload */
-		uint8_t charCounter;
-				charCounter = 0;
-		while (YAPp->payloadLength != charCounter) {
-			if (!(YAPp->payload[charCounter] >= 0x20 && YAPp->payload[charCounter] <= 0x7E))
-				YAP_sendByte(handler, DLE);
-
-			YAP_sendByte(handler, YAPp->payload[charCounter]);
-
-			++charCounter;
-		}
-		// TODO add CRC
-		++tries;
-	} while (!YAP_poolForAnswear(handler, ETX, ACK) && tries < 4);
-
-	if (tries >= 3)
+	if (!YAP_poolForAnswear(handler, YAPp->packetID, ACK))
 		return 0;
 
-	/* Finish transmission */
-	YAPp->AsyncState = FINISHING_TRANSMISSION;
-	return YAP_poolForAnswear(handler, EOT, ACK);
-}
+	if (!YAP_poolForAnswear(handler, YAPp->payloadLength, ACK))
+		return 0;
 
-void YAP_sendPacketAsync(YAPHandler *handler, YAPPacket *packet) {
-	//TODO implement
+	uint8_t charCounter = 0;
+	while(charCounter != (YAPp->payloadLength - 2)) {
+		YAP_sendByte(handler, YAPp->payload[charCounter]);
+		++charCounter;
+	}
+
+	YAP_sendByte(handler, (uint8_t)(YAPp->crc16 >> 8));
+	YAP_sendByte(handler, (uint8_t)(YAPp->crc16));
+
+	if (YAP_poolForAnswear(handler, EOT, ACK))
+		return 1;
+	else
+		return 0;
 }

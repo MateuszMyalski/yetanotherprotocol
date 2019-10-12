@@ -13,19 +13,12 @@
 #include "usart.h"
 
 typedef enum {
-    WAIT_FOR_ENQ,
-    WAIT_FOR_STX,
-    WAIT_FOR_ETX,
-    WAIT_FOR_EOT,
-    ENQUIRING_TRANSMISSION,
-    FINISHING_TRANSMISSION,
+	TRANSSMISION_NOT_ENQUIRED,
+    RECEIVE_PAYLOAD_ID,
+    RECEIVE_PAYLOAD_LENGTH,
     RECEIVING_PAYLOAD,
-    SENDING_PAYLOAD,
-    PAYLOAD_CHECK,
-    PAYLOAD_CHECK_FATAL,
-    PAYLOAD_CHECK_SUCCESS,
-    PAYLOAD_READY,
-} YAPAsyncStateEnum;
+    PACKET_READY
+} YAPStateEnum;
 
 typedef void YAPHandler;
 typedef void YAPPacket;
@@ -33,7 +26,7 @@ typedef void YAPPacket;
 void        YAP_handlerDestroy (void *handler);
 YAPHandler 	*YAP_handlerCreate  (UART_HandleTypeDef *uart);
 
-void 		YAP_setAnswearTimeout  (YAPHandler *handler, uint16_t answearTimeout);
+void 		YAP_setAnswearTimeout  (YAPHandler *handler, uint32_t answearTimeout);
 
 void        YAP_packetDestroy       (YAPPacket *packet);
 YAPPacket   *YAP_packetCreate       (uint8_t packetID, char *payload);
@@ -44,10 +37,10 @@ uint16_t    YAP_getAnswearTimeout   (YAPHandler *handler);
 uint8_t     YAP_getPacketID         (YAPPacket *packet);
 char        *YAP_getPacketPayload   (YAPPacket *packet);
 
-void YAP_sendPacketAsync    (YAPHandler *handler, YAPPacket *packet);
-void YAP_receivePacketAsync (YAPHandler *handler, YAPPacket *packet);
+void 	YAP_processByte		(YAPHandler *handler, YAPPacket *emptyPacket, uint8_t *byte);
 
 uint8_t YAP_sendPacket      (YAPHandler *handler, YAPPacket *packet);
-uint8_t YAP_receivePacket   (YAPHandler *handler, YAPPacket *packet, uint8_t *transsmisionEnquiry);
+uint8_t YAP_receivePacket   (YAPHandler *handler, YAPPacket *packet);
+uint8_t YAP_isPacketReady	(YAPPacket *packet);
 
 #endif
