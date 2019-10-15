@@ -1,6 +1,9 @@
 {
     "files.associations": {
         "yap_internal.h": "c",
-        "yap.h": "c"
+        "yap.h": "c",
+        "time.h": "c",
+        "windows.h": "c",
+        "windef.h": "c"
     }
 }

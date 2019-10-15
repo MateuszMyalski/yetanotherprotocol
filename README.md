@@ -112,9 +112,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart) {
 }
 ```
 
- # Compiling
+# Compiling
 
 ```bash
+cd windows
 mingw32-make all
 ```
 

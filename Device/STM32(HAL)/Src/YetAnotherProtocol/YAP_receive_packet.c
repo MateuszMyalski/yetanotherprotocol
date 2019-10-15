@@ -32,8 +32,8 @@
 
 #include "YetAnotherProtocol/YAP_internal.h"
 
-uint8_t YAP_receivePacket(YAPHandler *handler, YAPPacket *packet) {
-	YAPPacketInternal 	*YAPp = (YAPPacketInternal *)packet;
+uint8_t YAP_receivePacket(YAPHandler *handler, YAPPacket *emptyPacket) {
+	YAPPacketInternal 	*YAPp = (YAPPacketInternal *)emptyPacket;
 
 	/* Check payload length */
 	if (YAPp->payloadCounter != YAPp->payloadLength) {
